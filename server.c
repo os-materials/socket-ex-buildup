@@ -4,15 +4,20 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include <unistd.h>
 
 char * buffer = NULL;
 int sock;
 int client;
 
+void close_gracefully(int sig);
+
 void read_stdin();
 
 int main()
 {
+	signal(SIGINT, close_gracefully);
 	struct sockaddr_in my_address;
 	my_address.sin_family = AF_INET;
 	my_address.sin_addr.s_addr = INADDR_ANY;
@@ -35,7 +40,7 @@ int main()
 	{
 		perror("listen:");
 		close(sock);
-		edit(1);
+		exit(1);
 	}
 
 	client = accept(sock, NULL, NULL);
@@ -44,7 +49,7 @@ int main()
 	while (1)
 	{
 		read(client, data, 256);
-		printf(">>%s\n"
+		printf(">>%s\n", data);
 	}
 
 	return 0;
@@ -57,4 +62,10 @@ void read_stdin()
 	{
 		getline(&buffer, &n, stdin);
 	}
+}
+
+void close_gracefully(int sig)
+{
+	close(sock);
+	free(buffer);
 }

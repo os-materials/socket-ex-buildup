@@ -7,6 +7,7 @@
 
 char * buffer = NULL;
 int sock;
+int client;
 
 void read_stdin();
 
@@ -35,6 +36,15 @@ int main()
 		perror("listen:");
 		close(sock);
 		edit(1);
+	}
+
+	client = accept(sock, NULL, NULL);
+
+	char data[256];
+	while (1)
+	{
+		read(client, data, 256);
+		printf(">>%s\n"
 	}
 
 	return 0;

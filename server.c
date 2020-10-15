@@ -19,8 +19,22 @@ int main()
 
 	if (sock == -1)
 	{
-		perror("Error creating socket:");
+		perror("socket:");
 		exit(1);
+	}
+	
+	if (bind(sock, (struct sockaddr*) &my_address, sizeof(struct sockaddr_in)) == -1)
+	{
+		perror("bind:");
+		close(sock);
+		exit(1);
+	}
+
+	if (listen(sock, 10) == -1)
+	{
+		perror("listen:");
+		close(sock);
+		edit(1);
 	}
 
 	return 0;

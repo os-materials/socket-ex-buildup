@@ -20,7 +20,7 @@ int main(int argc, char * argv[])
 {
 	if (argc < 2)
 	{
-		printf("No hostname provided; exiting");
+		printf("No hostname provided; exiting\n");
 		exit(1);
 	}
 
@@ -39,6 +39,14 @@ int main(int argc, char * argv[])
 	server.sin_port = htons(9999);
 	memcpy(&server.sin_addr, host->h_addr, host->h_length);
 
+	if (connect(sock, (const struct sockaddr*)& server, sizeof(struct sockaddr_in)) == -1)
+	{
+		perror("connect:");
+		close(sock);
+		exit(1);
+	}
+
+	read_stdin();
 
 	/*char data[256];
 	while (1)
@@ -56,6 +64,8 @@ void read_stdin()
 	while(1)
 	{
 		getline(&buffer, &n, stdin);
+		buffer[strlen(buffer)-1] = 0;
+		write(sock, buffer, strlen(buffer) + 1);
 	}
 }
 

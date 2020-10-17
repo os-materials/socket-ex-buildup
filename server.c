@@ -20,6 +20,7 @@ int main()
 	signal(SIGINT, close_gracefully);
 	struct sockaddr_in my_address;
 	my_address.sin_family = AF_INET;
+	my_address.sin_port = htons(9999);
 	my_address.sin_addr.s_addr = INADDR_ANY;
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -68,4 +69,5 @@ void close_gracefully(int sig)
 {
 	close(sock);
 	free(buffer);
+	exit(1);
 }

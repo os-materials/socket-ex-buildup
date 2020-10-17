@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <unistd.h>
+#include <pthread.h>
 
 char * buffer = NULL;
 int sock;
@@ -14,6 +15,7 @@ int client;
 void close_gracefully(int sig);
 
 void read_stdin();
+void * write_thread(void * args);
 
 int main()
 {
@@ -46,6 +48,9 @@ int main()
 
 	client = accept(sock, NULL, NULL);
 
+	pthread_t th;
+	pthread_create (&th, NULL, write_thread, NULL);
+
 	char data[256];
 	while (1)
 	{
@@ -62,12 +67,19 @@ void read_stdin()
 	while(1)
 	{
 		getline(&buffer, &n, stdin);
+		buffer[strlen(buffer)-1] = 0;
+		write(client, buffer, strlen(buffer)+1);
 	}
+}
+
+void * write_thread (void * args)
+{
+	read_stdin();
 }
 
 void close_gracefully(int sig)
 {
 	close(sock);
 	free(buffer);
-	exit(1);
+	exit(0);
 }
